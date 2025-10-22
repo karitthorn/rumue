@@ -1,0 +1,27 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='900' height='780' viewBox='0 0 900 780' font-family='TH Sarabun New, sans-serif'>
+<defs><marker id='arrow' markerWidth='10' markerHeight='10' refX='5' refY='3' orient='auto' markerUnits='strokeWidth'><path d='M0,0 L0,6 L9,3 z' fill='#1f3d7a'/></marker></defs>
+<rect x='0' y='0' width='900' height='780' fill='white'/>
+<rect x='270.0' y='40.0' width='360' height='80' rx='22' ry='22' fill='#eef2fb' stroke='#1f3d7a' stroke-width='2.4' />
+<text x='450' y='86.0' font-size='20' text-anchor='middle' fill='#102147'>เริ่มต้นและตั้งค่าไลบรารี/พาธ</text>
+<rect x='270.0' y='130.0' width='360' height='100' rx='22' ry='22' fill='#eef2fb' stroke='#1f3d7a' stroke-width='2.4' />
+<text x='450' y='186.0' font-size='20' text-anchor='middle' fill='#102147'>อ่านไฟล์ exercise_6.wav, แปลงเป็นโมโน
+คำนวณ sample rate, duration, amplitudes</text>
+<rect x='270.0' y='240.0' width='360' height='120' rx='22' ry='22' fill='#eef2fb' stroke='#1f3d7a' stroke-width='2.4' />
+<text x='450' y='306.0' font-size='20' text-anchor='middle' fill='#102147'>ทำ FFT, วิเคราะห์สเปกตรัม, find_peaks
+เลือกความถี่รบกวนหลัก 1976 Hz และ 4143 Hz</text>
+<rect x='270.0' y='375.0' width='360' height='110' rx='22' ry='22' fill='#eef2fb' stroke='#1f3d7a' stroke-width='2.4' />
+<text x='450' y='436.0' font-size='20' text-anchor='middle' fill='#102147'>นิยาม apply_time_limited_notch
+ตั้งค่า Q จากความถี่/แบนด์วิดท์ และจำกัดช่วงเวลา</text>
+<rect x='270.0' y='490.0' width='360' height='140' rx='22' ry='22' fill='#eef2fb' stroke='#1f3d7a' stroke-width='2.4' />
+<text x='450' y='566.0' font-size='20' text-anchor='middle' fill='#102147'>ประมวลผลสัญญาณ: notch 1975.5 Hz (0–5s, 150 Hz),
+1975.5 Hz (3–5.5s, 1000 Hz), 4143.5 Hz (0–15s, 80 Hz)
+clip ให้อยู่ใน [-1, 1] และบันทึกไฟล์ cleaned</text>
+<rect x='270.0' y='640.0' width='360' height='120' rx='22' ry='22' fill='#eef2fb' stroke='#1f3d7a' stroke-width='2.4' />
+<text x='450' y='706.0' font-size='20' text-anchor='middle' fill='#102147'>คำนวณ FFT/Spectrogram ใหม่, สร้างกราฟเปรียบเทียบ,
+ตรวจสอบด้วยการฟังและสรุปผล</text>
+<path d='M450,120.0 C450,125.0 450,125.0 450,130.0' stroke='#1f3d7a' stroke-width='2.4' fill='none' marker-end='url(#arrow)' />
+<path d='M450,230.0 C450,235.0 450,235.0 450,240.0' stroke='#1f3d7a' stroke-width='2.4' fill='none' marker-end='url(#arrow)' />
+<path d='M450,360.0 C450,367.5 450,367.5 450,375.0' stroke='#1f3d7a' stroke-width='2.4' fill='none' marker-end='url(#arrow)' />
+<path d='M450,485.0 C450,487.5 450,487.5 450,490.0' stroke='#1f3d7a' stroke-width='2.4' fill='none' marker-end='url(#arrow)' />
+<path d='M450,630.0 C450,635.0 450,635.0 450,640.0' stroke='#1f3d7a' stroke-width='2.4' fill='none' marker-end='url(#arrow)' />
+</svg>
