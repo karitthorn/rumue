@@ -2,78 +2,178 @@
 #set page(paper: "a4")
 #show page: set text(font: "TH sarabun new")
 #show: ieee.with(
-  title: text(font: "TH sarabun new")[การออกแบบระบบกำจัดสัญญาณรบกวนด้วยเทคนิคการแปลงในงาน\ ประมวลผลสัญญาณ],
-  // abstract: text(font: "TH sarabun new")[
-  //   ทดสอบ สสวสาดาสหำดาสวหวดาสหสวดาสว
-  // ],
+  title: text(font: "TH sarabun new")[การพัฒนาระบบจำแนกภาษามือด้วยเทคนิคการเรียนรู้เชิงลึก],
   authors: (
     (
       name: "คริษฐ์ธร บำรุงพิพัฒนพร",
       department: text(font: "TH sarabun new")[6610501998],
-      organization: text(font: "TH sarabun new")[วิศวะคอมพิวเตอร์],
-      location: text(font: "TH sarabun new")[มหาลัยเกษตรศาสตร์ บางเขน],
+      organization: text(font: "TH sarabun new")[วิศวกรรมคอมพิวเตอร์],
+      location: text(font: "TH sarabun new")[มหาวิทยาลัยเกษตรศาสตร์ บางเขน],
       email: "karitthorn.b@ku.th",
     ),
-
+        (
+      name: "คริษฐ์ธร บำรุงพิพัฒนพร",
+      department: text(font: "TH sarabun new")[6610501998],
+      organization: text(font: "TH sarabun new")[วิศวกรรมคอมพิวเตอร์],
+      location: text(font: "TH sarabun new")[มหาวิทยาลัยเกษตรศาสตร์ บางเขน],
+      email: "karitthorn.b@ku.th",
+    ),
   ),
-  // index-terms: ("Scientific writing", "Typesetting", "Document creation", "Syntax"),
-  // bibliography: bibliography("refs.bib"),
   figure-supplement: [Fig.],
 )
 
 // Apply font settings after IEEE template to override its defaults
 #set text(font: "TH sarabun new", size: 11pt)
-#set par(justify: false, leading: 0.65em)
+#set par(justify: true, leading: 0.65em)
 #show figure.caption: set align(center)
-
-// Force font for all text including template sections
 
 #set align(center)
 = บทนำ
 
-โครงงานนี้จัดทำขึ้นในรายวิชา เทคนิคการแปลงในการประมวลผลสัญญาณ (Transform Techniques in Signal Processing) โดยมีเป้าหมายเพื่อพัฒนาโปรแกรมที่สามารถตรวจจับและกำจัดสัญญาณรบกวนในโดเมนความถี่ออกจาก\ สัญญาณเสียงที่ได้รับ ซึ่งในแต่ละกรณีจะมีลักษณะของความถี่รบกวนและช่วง\ เวลาที่เกิดการรบกวนแตกต่างกันไป
 #set align(left)
-= แนวทางการแก้ไขปัญหา
+โครงงานนี้มีวัตถุประสงค์เพื่อพัฒนาระบบจำแนกภาษามือ (Sign Language Recognition) โดยใช้เทคนิคการเรียนรู้เชิงลึก (Deep Learning) เพื่อแปลงท่าภาษามือเป็นตัวอักษร A-Z โดยใช้ชุดข้อมูล Sign Language MNIST จาก Kaggle ซึ่งประกอบด้วยภาพมือที่แสดงท่าทางต่างๆ ของตัวอักษร 24 ตัว (ยกเว้น J และ Z ที่ต้องใช้ท่าทางเคลื่อนไหว)
 
-ขั้นตอนการตัดสัญญาณรบกวนประกอบด้วยห้าส่วนหลักดังนี้:
+ระบบที่พัฒนาขึ้นนี้สามารถนำไปประยุกต์ใช้ในการสื่อสารกับผู้บกพร่องทางการได้ยินและการพูด รวมถึงเป็นเครื่องมือช่วยในการเรียนรู้ภาษามือสำหรับบุคคลทั่วไป
 
-+ *การอ่านไฟล์เสียง:* อ่านไฟล์เสียง exercise_6.wav ด้วยไลบรารี soundfile แล้วบังคับให้ข้อมูลอยู่ในรูปแบบ float64 เพื่อให้กระบวนการประมวลผลมีความสม่ำเสมอ หากไฟล์มีหลายแชนเนลจะเฉลี่ยให้เหลือโมโน จากนั้นคำนวณค่า sample rate ระยะเวลารวม และค่าสูงสุด/ต่ำสุดของสัญญาณไว้เป็นตัวชี้วัดก่อนการกรอง
+= ชุดข้อมูลและการเตรียมข้อมูล
 
-+ *การวิเคราะห์ความถี่:* วิเคราะห์ความถี่หลักด้วยการทำ FFT แล้วเลือกเฉพาะสเปกตรัมด้านบวกเพื่อเลี่ยงความซ้ำซ้อน นำค่าความดังมาแปลงเป็น Frequency Spectrum ก่อนใช้ scipy.signal.find_peaks ใต้ยอดสูงสุด โดยแสดงภาพรวมของสเปกตรัมทั้งช่วงในรูป จะพบว่าจะมี noise ที่ 1975.5 Hz กับ 4143.5 Hz เเละจะเเสดงสเปกตรัมซูมที่ 1976.0  เเละ 4143 Hz ในรูป และ  ตามลำดับ 
-  #figure(
-    image("figures/frequency_spectrum_analysis.png", width: 8cm),
-    caption: align(center)[การเเสดงสเปกตรัมรวมเพื่อหา Magnitude Peaks ในสัญญาณต้นฉบับ.],
-  ) <fig:spectrum-overview>
+== ชุดข้อมูล Sign Language MNIST
 
+ชุดข้อมูลที่ใช้ในโครงงานนี้คือ Sign Language MNIST จาก Kaggle โดยมีรายละเอียดดังนี้:
 
+- *ขนาดข้อมูล:* ข้อมูลฝึกสอน 27,455 ภาพ และข้อมูลทดสอบ 7,172 ภาพ
+- *จำนวนคลาส:* 24 คลาส (A-Y ยกเว้น J ที่ต้องใช้การเคลื่อนไหว)
+- *ขนาดภาพ:* 28×28 พิกเซล (grayscale)
+- *รูปแบบข้อมูล:* ไฟล์ CSV ที่มี 785 คอลัมน์ (1 label + 784 pixels)
 
+== การเตรียมข้อมูล
 
-  \ 
+กระบวนการเตรียมข้อมูลประกอบด้วยขั้นตอนดังนี้:
 
-+ *การสร้างฟังก์ชันกรอง:* สร้างฟังก์ชัน apply_time_limited_notch เพื่อออกแบบ notch filter แบบ IIR ที่ใช้กรองเฉพาะช่วงเวลาที่กำหนด โดยคำนวณดัชนีเริ่มและสิ้นสุดจากวินาทีที่กำหนดกับค่า sample rate แล้วใช้ scipy.signal.filtfilt กรองไป-กลับเพื่อลดการบิดเบือนเฟส
++ *Reshape:* แปลงข้อมูลจาก flat array เป็นรูปภาพขนาด 28×28×1
++ *Normalization:* ปรับค่าพิกเซลให้อยู่ในช่วง [0, 1] โดยหารด้วย 255.0
++ *Train/Validation Split:* แบ่งข้อมูลแบบ stratified เป็น 80:20 ได้ข้อมูล 21,964 ภาพสำหรับการฝึกสอนและ 5,491 ภาพสำหรับการตรวจสอบ
++ *One-Hot Encoding:* แปลง labels เป็น categorical format สำหรับ 25 คลาส
++ *การแปลงสำหรับ Transfer Learning:* แปลง grayscale เป็น RGB และปรับขนาดเป็น 96×96 พิกเซล
 
-+ *การประยุกต์ใช้ฟิลเตอร์:* ใช้ฟังก์ชันดังกล่าวกับสำเนาของสัญญาณเดิม 3 ครั้ง ได้แก่:
-  - กรองความถี่ 1975.5 Hz ช่วง 0–5 วินาที แบนด์วิดท์ 150 Hz เพื่อลดฮัมช่วงต้น
-  - กรองความถี่เดียวกันช่วง 3–5.5 วินาที ด้วยแบนด์วิดท์ 1000 Hz เพื่อลดฮัมที่กระจายกว้าง
-  - กรองความถี่ 4143.5 Hz ช่วง 0–15 วินาที แบนด์วิดท์ 80 Hz เพื่อจัดการฮัมลำดับสอง
+== Data Augmentation
 
-+ *การประเมินผล:* ประเมินผลหลังกรองด้วยการเปรียบเทียบสเปกโตรแกรมก่อนและหลัง ซึ่งสรุปไว้ในรูป เพื่อยืนยันว่าพลังงานในย่านรบกวนลดลงตลอดช่วงเวลาที่สนใจ เเละ เเสดงภาพการซูมสเปกตรัมในรูป และ 
+เพื่อเพิ่มความหลากหลายของข้อมูลและลดปัญหา overfitting ได้ใช้เทคนิค Data Augmentation ดังนี้:
 
+*สำหรับ CNN Model:*
+- การหมุนภาพ: ±10 องศา
+- การเลื่อนแนวนอน/แนวตั้ง: 0.1
+- การซูม: 0.1
+- การเอียง (shear): 0.1
 
+*สำหรับ Transfer Learning Model:*
+- การหมุนภาพ: ±15 องศา
+- การเลื่อนแนวนอน/แนวตั้ง: 0.15
+- การซูม: 0.15
+- การเอียง (shear): 0.15
+- ไม่ใช้การพลิกแนวนอน เนื่องจากภาษามือมีทิศทางที่สำคัญ
 
+= สถาปัตยกรรมของโมเดล
 
-\
-เพื่อให้เห็นภาพรวมของกระบวนการทั้งหมดอย่างชัดเจน สามารถดูแผนภาพสายงานในรูป แสดงลำดับขั้นจากการเตรียมข้อมูลจนถึงการประเมินผลหลังการกรอง
+โครงงานนี้ได้พัฒนาโมเดลสองแบบเพื่อเปรียบเทียบประสิทธิภาพ
 
+== โมเดล CNN แบบกำหนดเอง
 
+โมเดล Convolutional Neural Network ที่ออกแบบเองประกอบด้วย:
 
+*Convolutional Blocks (3 blocks):*
+- Block 1: Conv2D(32, 3×3) + BatchNorm + Conv2D(32, 3×3) + BatchNorm + MaxPooling(2×2) + Dropout(0.25)
+- Block 2: Conv2D(64, 3×3) + BatchNorm + Conv2D(64, 3×3) + BatchNorm + MaxPooling(2×2) + Dropout(0.25)
+- Block 3: Conv2D(128, 3×3) + BatchNorm + Conv2D(128, 3×3) + BatchNorm + MaxPooling(2×2) + Dropout(0.25)
 
-== เครื่องมือและเหตุผล
+*Dense Layers:*
+- Flatten() → Dense(256) + BatchNorm + Dropout(0.5)
+- Dense(128) + BatchNorm + Dropout(0.5)
+- Dense(25, softmax)
 
-ไลบรารีหลักที่ใช้คือ numpy สำหรับจัดการข้อมูลสัญญาณ soundfile สำหรับอ่านและเขียนไฟล์เสียง scipy.signal สำหรับออกแบบฟิลเตอร์และวิเคราะห์ความถี่ matplotlib สำหรับสร้างกราฟ และ IPython.display.Audio สำหรับพรีวิวเสียง
+== โมเดล Transfer Learning (MobileNetV2)
 
-การจำกัดช่วงเวลาของ notch filter ทำให้สัญญาณหลักในย่านเดียวกันยังคงรายละเอียด ขณะที่ filtfilt ป้องกันการหน่วงเฟส การทดลองปรับค่าแบนด์วิดท์และช่วงเวลาช่วยให้ลดเสียงรบกวนโดยไม่ทำลายข้อมูลสำคัญ
+โมเดลที่ใช้ Transfer Learning ด้วย MobileNetV2 ที่ฝึกมาจาก ImageNet:
 
-= สรุปผลการทดลอง
+*Base Model:* MobileNetV2 (input: 96×96×3, pretrained weights: ImageNet)
 
-ผลการทดลองแสดงให้เห็นว่า notch filter ที่จำกัดช่วงเวลาและความกว้างแบนด์สามารถกำจัดสัญญาณรบกวนที่ 1975.5 Hz และ 4143.5 Hz ได้อย่างมีประสิทธิภาพ โดยพลังงานย่านรบกวนลดลงชัดเจนในสเปกตรัมและสเปกโตรแกรม ขณะที่สัญญาณหลักยังคงรายละเอียดสำคัญ โดยค่า MAE ของสัญญาณทั้งหมดคือ 0.012739
+*Custom Layers:*
+- GlobalAveragePooling2D()
+- BatchNormalization()
+- Dense(256, relu) + Dropout(0.5)
+- BatchNormalization()
+- Dense(128, relu) + Dropout(0.3)
+- Dense(25, softmax)
+
+การฝึกสอนแบ่งเป็น 2 phases:
+- Phase 1: Freeze base model ทั้งหมด
+- Phase 2: Fine-tuning โดย unfreeze ชั้นบนสุด (ชั้น 100 แรกยัง frozen)
+
+= การฝึกสอนโมเดล
+
+== พารามิเตอร์การฝึกสอน
+
+*สำหรับ CNN Model:*
+- Optimizer: Adam (learning rate = 0.001)
+- Loss Function: Categorical Crossentropy
+- Batch Size: 128
+- Epochs: 5
+
+*สำหรับ Transfer Learning Model:*
+- Phase 1: Adam (lr = 0.001), batch size = 64, epochs = 5
+- Phase 2: Adam (lr = 1×10⁻⁵), batch size = 64, epochs = 5
+
+== Callbacks
+
+ใช้ Callbacks เพื่อปรับปรุงการฝึกสอน:
+- *ModelCheckpoint:* บันทึก best model ตาม validation accuracy
+- *EarlyStopping:* หยุดการฝึกสอนเมื่อ validation loss ไม่ดีขึ้นใน 10 epochs
+- *ReduceLROnPlateau:* ลด learning rate อัตโนมัติเมื่อ loss ไม่ดีขึ้น (factor = 0.5, patience = 5)
+
+= ผลการทดลองและการประเมินผล
+
+== ผลลัพธ์ของโมเดล
+
+#table(
+  columns: (auto, auto, auto),
+  align: center,
+  [*โมเดล*], [*Test Accuracy*], [*Test Loss*],
+  [Custom CNN], [99.00%], [0.0360],
+  [Transfer Learning], [93.54%], [0.1654],
+)
+
+จากผลการทดลอง พบว่าโมเดล CNN ที่ออกแบบเองให้ผลลัพธ์ที่ดีกว่าโมเดล Transfer Learning อย่างมีนัยสำคัญ โดยมีความแม่นยำ 99.00% บนชุดข้อมูลทดสอบ
+
+== การประเมินผลละเอียด
+
+การประเมินผลของโมเดล CNN แสดงให้เห็นว่า:
+- *Precision, Recall, F1-Score:* มีค่าเกือบ 1.00 ในทุกคลาส
+- *Confusion Matrix:* แสดงการทำนายที่แม่นยำสูงในทุกคลาส
+- *Training History:* แสดงการลู่เข้าที่ดีโดยไม่มีปัญหา overfitting
+
+== เครื่องมือการประเมินผล
+
+ใช้เครื่องมือหลายอย่างในการประเมินผล:
++ *Classification Report:* แสดงค่า precision, recall, f1-score สำหรับแต่ละคลาส
++ *Confusion Matrix:* Visualize การทำนายในรูปแบบ heatmap
++ *Training History Plots:* กราฟแสดง accuracy และ loss ของ training/validation
++ *Random Sample Testing:* ทดสอบด้วยภาพสุ่มพร้อมแสดง Top-3 predictions
+
+= สรุปและอภิปรายผล
+
+โครงงานนี้แสดงให้เห็นว่าการพัฒนาโมเดล CNN ที่ออกแบบเองสามารถให้ผลลัพธ์ที่ดีเยี่ยมในงานจำแนกภาษามือ โดยมีความแม่นยำถึง 99.00% ซึ่งสูงกว่าการใช้ Transfer Learning จาก MobileNetV2 (93.54%)
+
+*จุดเด่นของโครงงาน:*
++ การออกแบบสถาปัตยกรรม CNN ที่เหมาะสมกับข้อมูล
++ การใช้ Batch Normalization และ Dropout อย่างเหมาะสม
++ Data Augmentation ที่คำนึงถึงลักษณะของภาษามือ (ไม่พลิกแนวนอน)
++ การใช้ Stratified Split เพื่อรักษาสัดส่วนคลาส
++ Callbacks ที่ครบถ้วนสำหรับ optimization
+
+*การพัฒนาต่อยอด:*
++ เพิ่มคลาส J และ Z โดยใช้ video sequences
++ พัฒนา real-time recognition ด้วย webcam
++ ขยายไปยังภาษามือภาษาอื่นๆ
++ สร้าง mobile application สำหรับใช้งานจริง
+
+โมเดลที่พัฒนาขึ้นมีศักยภาพในการนำไปประยุกต์ใช้งานจริง เช่น ระบบแปลภาษามือแบบ real-time หรือแอปพลิเคชันช่วยการเรียนรู้ภาษามือ ซึ่งจะเป็นประโยชน์ต่อการสื่อสารกับผู้บกพร่องทางการได้ยินและการพูด
